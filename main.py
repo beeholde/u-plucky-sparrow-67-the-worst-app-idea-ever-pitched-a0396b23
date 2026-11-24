@@ -18,6 +18,10 @@ LINE = (
 def check(text: str) -> None:
     if not (1 <= len(text) <= 240):
         raise SystemExit(f"entry must be 1-240 characters, got {len(text)}")
+    if len(text.encode("utf-8")) > 240:
+        # The gate counts characters, but keep the byte length in range too
+        # so a future edit with wide characters cannot silently break the cap.
+        raise SystemExit("entry must be at most 240 bytes")
     if not text.strip():
         raise SystemExit("entry must not be only whitespace")
     if "\n" in text or "\r" in text:
