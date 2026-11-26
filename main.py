@@ -1,51 +1,45 @@
-#!/usr/bin/env python3
-"""Worst-app pitch entry (v3): writes one sentence to /output/entry.txt.
+"""Produce this entry's one-sentence product pitch.
 
-The pitch names a specific useless app in a single sentence of 198
-characters (the gate allows 1-240), encoded as UTF-8 with no trailing
-newline. The program is deterministic: identical bytes on every run.
+Execution creates the destination folder when needed and records the
+sentence in UTF-8, deliberately leaving off any final line break.
 """
-import os
+
 from pathlib import Path
 
-PITCH = (
-    "ForgotMe is a $4.99-a-month app that emails your password to the "
-    "inbox you are locked out of, then deletes the email for your "
-    "security, because a secret nobody can read is a secret nobody can "
-    "steal."
+
+DESTINATION_FOLDER = Path("/output")
+DESTINATION_FILE = DESTINATION_FOLDER / "entry.txt"
+MAXIMUM_CHARACTERS = 240
+
+PITCH_SENTENCE = (
+    "ForgotMe is a $4.99-a-month app that emails your password "
+    "to the inbox you are locked out of, then deletes the email "
+    "for your security, because a secret nobody can read is a "
+    "secret nobody can steal."
 )
 
-OUTPUT_PATH = Path("/output/entry.txt")
+
+def check_sentence(sentence: str) -> None:
+    """Stop unless the supplied text fits the entry requirements."""
+    if not sentence.strip():
+        raise ValueError("the pitch cannot be blank")
+    if "\n" in sentence or "\r" in sentence:
+        raise ValueError("the pitch must occupy a single line")
+    if len(sentence) > MAXIMUM_CHARACTERS:
+        raise ValueError("the pitch is longer than permitted")
+    if not sentence.endswith("."):
+        raise ValueError("the pitch must end with a full stop")
+    if len(sentence.encode("utf-8")) > MAXIMUM_CHARACTERS:
+        raise ValueError("the encoded pitch is longer than permitted")
 
 
-def validate(pitch: str) -> bytes:
-    """Return the pitch as UTF-8 bytes, rejecting anything off-gate."""
-    if not 1 <= len(pitch) <= 240:
-        raise SystemExit(f"pitch must be 1-240 characters, got {len(pitch)}")
-    if not pitch.strip():
-        raise SystemExit("pitch must not be only whitespace")
-    if "\n" in pitch or "\r" in pitch:
-        raise SystemExit("pitch must be a single line")
-    if not pitch.endswith("."):
-        raise SystemExit("pitch must be one sentence ending in a period")
-    payload = pitch.encode("utf-8")
-    if len(payload) > 240:
-        # The gate counts characters; cap bytes too so a future edit with
-        # wide characters cannot silently break the limit.
-        raise SystemExit("pitch must be at most 240 bytes")
-    return payload
-
-
-def write_entry(payload: bytes) -> None:
-    OUTPUT_PATH.parent.mkdir(parents=True, exist_ok=True)
-    os.umask(0o022)
-    OUTPUT_PATH.write_bytes(payload)
-    os.chmod(OUTPUT_PATH, 0o644)
-
-
-def main() -> None:
-    write_entry(validate(PITCH))
+def store_sentence(sentence: str) -> None:
+    """Save a checked pitch at the required destination."""
+    check_sentence(sentence)
+    DESTINATION_FOLDER.mkdir(parents=True, exist_ok=True)
+    DESTINATION_FILE.write_bytes(sentence.encode("utf-8"))
+    DESTINATION_FILE.chmod(0o644)
 
 
 if __name__ == "__main__":
-    main()
+    store_sentence(PITCH_SENTENCE)
