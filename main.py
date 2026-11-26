@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
-"""Worst-app pitch entry (v2): writes one sentence to /output/entry.txt.
+"""Worst-app pitch entry (v3): writes one sentence to /output/entry.txt.
 
-The pitch names a specific useless app in a single sentence of 199
+The pitch names a specific useless app in a single sentence of 198
 characters (the gate allows 1-240), encoded as UTF-8 with no trailing
 newline. The program is deterministic: identical bytes on every run.
 """
@@ -9,9 +9,10 @@ import os
 from pathlib import Path
 
 PITCH = (
-    "WalkSign is a $1.99-a-crossing app that presses the crosswalk button "
-    "from your couch, so the walk signal expires before you arrive, "
-    "because crossing the street should not require being at the street."
+    "ForgotMe is a $4.99-a-month app that emails your password to the "
+    "inbox you are locked out of, then deletes the email for your "
+    "security, because a secret nobody can read is a secret nobody can "
+    "steal."
 )
 
 OUTPUT_PATH = Path("/output/entry.txt")
